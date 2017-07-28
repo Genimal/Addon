@@ -1,4 +1,4 @@
---차단알림
+--spell alert
 
 local alert=CreateFrame("Frame")
 alert:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
