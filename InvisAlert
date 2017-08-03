@@ -1,0 +1,98 @@
+--Alerts who used Potion of trivial invisibility
+local cfg = {}
+cfg.all = true
+cfg.alarm = true
+local alert=CreateFrame("Frame")
+alert:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+alert:SetScript("OnEvent",
+  function(_,_,_,combatEvent,_,_,sourceName,sourceFlags,sourceRaidFlags,destGUID,destName,destFlags, destRaidFlags,spellID,spellName,_,param1)
+if cfg.all == true then
+if combatEvent=="SPELL_AURA_APPLIED" and spellID == 216805 then --Detect Potion of Trivial Invisibility
+if cfg.alarm == true then PlaySoundKitID(26080) end
+  for i=1, GetNumGroupMembers() do local name, rank, _, _, _, _ = GetRaidRosterInfo(i)
+		if name==UnitName("player") then
+			if IsInRaid() and rank>=1 then
+				SendChatMessage(sourceName.." used Potion of Trivial Invisibility!!", "RAID_WARNING")
+			else
+				SendChatMessage(sourceName.." used Potion of Trivial Invisibility!!, IsInGroup(2) and "INSTANCE_CHAT" or "YELL")
+			end
+		end
+	end
+end
+elseif cfg.all == false then
+if combatEvent=="SPELL_AURA_APPLIED" and spellID == 216805 and (bit.band(sourceFlags,COMBATLOG_OBJECT_REACTION_HOSTILE)==COMBATLOG_OBJECT_REACTION_HOSTILE) then --Detect Potion of Trivial Invisibility
+if cfg.alarm == true then PlaySoundKitID(26080) end
+	for i=1, GetNumGroupMembers() do local name, rank, _, _, _, _ = GetRaidRosterInfo(i)
+		if name==UnitName("player") then
+			if IsInRaid() and rank>=1 then
+				SendChatMessage(sourceName.." used Potion of Trivial Invisibility!!, "RAID_WARNING")
+			else
+				SendChatMessage(sourceName.." used Potion of Trivial Invisibility!!, IsInGroup(2) and "INSTANCE_CHAT" or "YELL")
+			end
+		end
+	end
+end
+end
+end)
+------------------------------------------------
+local addOnName = ...
+
+-- main panel
+local panel = CreateFrame("Frame")
+panel.name = addOnName
+
+
+function Checkbox(self, selfid, px, py, description)
+    local checkbox = CreateFrame("CheckButton", "IAEnableButton_" .. selfid, self, "OptionsSmallCheckButtonTemplate")
+    checkbox:SetScript("OnClick", Checkbox_OnClick)
+    checkbox:SetPoint("TOPLEFT", self, px, py)
+    checkbox:SetWidth(28)
+    checkbox:SetHeight(28)
+    checkbox:SetHitRectInsets(0, -60, 0, 0)
+    checkbox:GetNormalTexture():SetAlpha(0.6)
+
+
+    local checkboxtexture = checkbox:CreateTexture(nil, "ARTWORK")
+    checkboxtexture:SetWidth(22)
+    checkboxtexture:SetHeight(22)
+    checkboxtexture:SetAlpha(0.9)
+    checkboxtexture:SetPoint("LEFT", 2, 1)
+    checkboxtexture:SetTexture("Interface\\RAIDFRAME\\ReadyCheck-Ready")
+    checkbox:SetCheckedTexture(checkboxtexture)
+    
+    local checkboxtext = self:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    checkboxtext:SetPoint("LEFT", checkbox, "RIGHT", 5, 1)
+    checkboxtext:SetFontObject("GameFontNormal")
+    checkboxtext:SetText(description)
+end
+ 
+function CreateOptions(self, TextTitle, DescriptionsText)
+    local title = self:CreateFontString(nil, "OVERLAY")
+    title:SetFontObject('GameFontNormalLarge')
+    title:SetPoint('TOPLEFT', 16, -16)
+    title:SetText(TextTitle)
+ 
+    local title2 = self:CreateFontString(nil, "OVERLAY")
+    title2:SetFontObject('GameFontHighlightSmall')
+    title2:SetPoint('TOPLEFT', 18, -35)
+    title2:SetText(DescriptionsText)
+end
+ 
+CreateOptions(panel, "|cffffbb00InvisAlert|r", "You can't save personal settings.")
+Checkbox(panel, 1, 18, -60, "Enemy Only")
+        IAEnableButton_1:SetScript("OnClick", function (self)
+                if self:GetChecked() then
+			cfg.all = false 
+		else 
+			cfg.all = true
+		end
+        end)
+Checkbox(IAEnableButton_1, 2, 0, -25, "Mute alarm sound")
+        IAEnableButton_2:SetScript("OnClick", function (self)
+                if self:GetChecked() then
+			cfg.alarm = false 
+		else 
+			cfg.alarm = true
+		end
+        end)
+InterfaceOptions_AddCategory(panel) 
