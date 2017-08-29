@@ -1,0 +1,5 @@
+﻿## Interface: 70200
+## Title: InvisAlert
+## Notes: 시시한 투명 물약 사용시 경보
+## SavedVariables: InvisAlertDB
+InvisAlert.lua
