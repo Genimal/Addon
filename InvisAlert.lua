@@ -3,7 +3,8 @@ InvisAlertDB = InvisAlertDB or {}
 local defaults = {
 all = false,
 alarm = true,
-warn = true
+warn = false,
+allassi = false
 }
 local temp = {}
 local buttons = {}
@@ -14,7 +15,7 @@ alert:SetScript("OnEvent",function(_,_,_,combatEvent,_,_,sourceName,sourceFlags,
 if combatEvent=="SPELL_AURA_APPLIED" and spellID == 216805 then --Detect Potion of Trivial Invisibility (216805)
 	if InvisAlertDB.all == true or (InvisAlertDB.all == false and (bit.band(destFlags,COMBATLOG_OBJECT_REACTION_HOSTILE)==COMBATLOG_OBJECT_REACTION_HOSTILE)) then
 	for i=1, GetNumGroupMembers() do local name, rank, _, _, _, _ = GetRaidRosterInfo(i)
-	if InvisAlertDB.alarm == true then PlaySoundKitID(26080) end -- Sound ID
+	if InvisAlertDB.alarm == true then PlaySound(26080) end -- Sound ID
 		if name==UnitName("player") and InvisAlertDB.warn == true then
 			SendChatMessage("투명 물약 사용 ▶ "..destName, (IsInRaid() and rank>=1) and "RAID_WARNING" or IsInGroup(2) and "INSTANCE_CHAT" or "YELL")
 		elseif InvisAlertDB.warn == false then
@@ -24,6 +25,14 @@ if combatEvent=="SPELL_AURA_APPLIED" and spellID == 216805 then --Detect Potion 
 	end
 end
 end) -- 물약 사용은 source와 dest. 구분이 의미없지만 다른 기술 추가시 꼭 신경써서 확인할 것.
+
+hooksecurefunc("RaidFrameAllAssistCheckButton_UpdateAvailable", function(self)
+	if InvisAlertDB.allassi == true then
+		if select(2,IsInInstance())=="pvp" and (UnitIsGroupLeader("player"))and not self:GetChecked() then 
+			self:Click();
+		end;
+	end
+end) -- 전장에서 자동으로 올부공 권한 부여
 
 --옵션창 시작
 local addOnName = ...
@@ -102,6 +111,11 @@ panel:SetScript('OnShow', function(self)
 	local IAButton3 = CreateCheckButton(self, 'warn')
 	IAButton3:SetPoint('TOPLEFT', IAButton2, 'BOTTOMLEFT', 0, -8)
 	IAButton3.Text:SetText('다른 사람에게도 출력')
+	
+	local IAButton4 = CreateCheckButton(self, 'allassi')
+	IAButton4:SetPoint('TOPLEFT', IAButton3, 'BOTTOMLEFT', 0, -8)
+	IAButton4.Text:SetText('전장에서 자동 부공격대장 승급')
+	
 	panel:refresh()
 	self:SetScript('OnShow', nil)
 end)
