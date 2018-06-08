@@ -28,8 +28,8 @@ end) -- 물약 사용은 source와 dest. 구분이 의미없지만 다른 기술
 
 hooksecurefunc("RaidFrameAllAssistCheckButton_UpdateAvailable", function(self)
 	if InvisAlertDB.allassi == true then
-		if select(2,IsInInstance())=="pvp" and (UnitIsGroupLeader("player"))and not self:GetChecked() then 
-			self:Click();
+		if select(2,IsInInstance())=="pvp" and (UnitIsGroupLeader("player"))and not IsEveryoneAssistant() then 
+			SetEveryoneIsAssistant(true);
 		end;
 	end
 end) -- 전장에서 자동으로 올부공 권한 부여
