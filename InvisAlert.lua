@@ -11,7 +11,8 @@ local buttons = {}
 
 local alert=CreateFrame("Frame")
 alert:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-alert:SetScript("OnEvent",function(_,_,_,combatEvent,_,_,sourceName,sourceFlags,sourceRaidFlags,destGUID,destName,destFlags, destRaidFlags,spellID,spellName,_,param1)
+alert:SetScript("OnEvent", function(...)
+local _,combatEvent,hideCaster,sourceGUID,sourceName,sourceFlags,sourceRaidFlags,destGUID,destName,destFlags, destRaidFlags,spellID,spellName,_,param1,_,_,param4 = CombatLogGetCurrentEventInfo()
 if combatEvent=="SPELL_AURA_APPLIED" and spellID == 216805 then --Detect Potion of Trivial Invisibility (216805)
 	if InvisAlertDB.all == true or (InvisAlertDB.all == false and (bit.band(destFlags,COMBATLOG_OBJECT_REACTION_HOSTILE)==COMBATLOG_OBJECT_REACTION_HOSTILE)) then
 	for i=1, GetNumGroupMembers() do local name, rank, _, _, _, _ = GetRaidRosterInfo(i)
